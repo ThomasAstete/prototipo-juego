@@ -1,9 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://bpelk0ox6peai"]
+[gd_scene load_steps=11 format=3 uid="uid://bpelk0ox6peai"]
 
 [ext_resource type="Material" uid="uid://kxis4q124ki1" path="res://Assets/Textures/suelo.tres" id="1_ahdyh"]
 [ext_resource type="PackedScene" uid="uid://cxiu3uoil06js" path="res://Scenes/player.tscn" id="2_kejqg"]
 [ext_resource type="PackedScene" uid="uid://d3tkrl6yurbpf" path="res://Scenes/item_llave.tscn" id="3_qgln6"]
 [ext_resource type="Script" uid="uid://bdabh3y06yxub" path="res://Scripts/generador_items.gd" id="3_v2md1"]
+[ext_resource type="Script" uid="uid://uwa3eskqt0ys" path="res://Scripts/puerta_salida.gd" id="5_sa2hf"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_qgln6"]
 sky_top_color = Color(0.5294118, 0.80784315, 0.92156863, 1)
@@ -21,6 +22,12 @@ tonemap_mode = 2
 ssr_enabled = true
 volumetric_fog_enabled = true
 volumetric_fog_density = 0.01
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_m7du4"]
+size = Vector3(1.5, 2.5, 0.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sa2hf"]
+albedo_color = Color(0.49803922, 0.31764707, 0.2, 1)
 
 [node name="WorldPrototype" type="Node3D"]
 
@@ -59,3 +66,19 @@ cantidad = 8
 altura_spawn = 1.0
 area_x = 18.0
 area_z = 18.0
+
+[node name="PuertaSalida" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7979407, 2.156925)
+collision_mask = 3
+script = ExtResource("5_sa2hf")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PuertaSalida"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.00432539, 0.20000005)
+shape = SubResource("BoxShape3D_m7du4")
+metadata/_edit_group_ = true
+
+[node name="CSGBox3D" type="CSGBox3D" parent="PuertaSalida"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.00432539, 0.20000005)
+size = Vector3(1.5, 2.5, 0.2)
+material = SubResource("StandardMaterial3D_sa2hf")
+metadata/_edit_group_ = true

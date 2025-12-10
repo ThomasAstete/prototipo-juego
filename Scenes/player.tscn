@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://cxiu3uoil06js"]
+[gd_scene load_steps=8 format=3 uid="uid://cxiu3uoil06js"]
 
 [ext_resource type="Script" uid="uid://7vl4eargj0uj" path="res://Scripts/player.gd" id="1_cvnsp"]
 [ext_resource type="PackedScene" uid="uid://bjx666vhoc4g6" path="res://Assets/Characters/Casual_Hoodie.gltf" id="1_v0iea"]
@@ -8,6 +8,12 @@
 height = 1.6883545
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_6t5aa"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_6t5aa"]
+font_size = 20
+
+[sub_resource type="LabelSettings" id="LabelSettings_vgqql"]
+font_size = 20
 
 [node name="Player" type="CharacterBody3D"]
 collision_layer = 2
@@ -20,6 +26,7 @@ shape = SubResource("CapsuleShape3D_cvnsp")
 [node name="CameraPivot" type="Node3D" parent="." node_paths=PackedStringArray("crosshair_ui")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 script = ExtResource("2_6t5aa")
+aim_h_offset = 1.2
 crosshair_ui = NodePath("../CanvasLayer/CenterContainer/MiraUi")
 
 [node name="SpringArm3D" type="SpringArm3D" parent="CameraPivot"]
@@ -32,7 +39,7 @@ current = true
 fov = 45.0
 
 [node name="RayCast3D" type="RayCast3D" parent="CameraPivot/SpringArm3D/Camera3D"]
-target_position = Vector3(0, 0, -100)
+target_position = Vector3(0, 0, -3)
 collision_mask = 17
 
 [node name="Casual_Hoodie" parent="." instance=ExtResource("1_v0iea")]
@@ -113,5 +120,27 @@ grow_vertical = 2
 [node name="MiraUi" type="ColorRect" parent="CanvasLayer/CenterContainer"]
 custom_minimum_size = Vector2(4, 4)
 layout_mode = 2
+
+[node name="ContadorUI" type="Label" parent="CanvasLayer"]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Llaves:0"
+label_settings = SubResource("LabelSettings_6t5aa")
+
+[node name="MensajeVictoria" type="Label" parent="CanvasLayer"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -38.5
+offset_top = -11.5
+offset_right = 38.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Escapaste"
+label_settings = SubResource("LabelSettings_vgqql")
 
 [editable path="Casual_Hoodie"]

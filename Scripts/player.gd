@@ -1,6 +1,8 @@
 extends CharacterBody3D
 
 # --- CONFIGURACIÓN ---
+var llaves_colectadas : int = 0
+@onready var contador_label = $CanvasLayer/ContadorUI # Ajusta la ruta si es necesario
 @export_group("Movimiento")
 @export var speed : float = 5.0
 @export var rotation_speed : float = 10.0
@@ -10,20 +12,39 @@ extends CharacterBody3D
 @export var rotation_offset : float = 180.0 
 
 @export_group("Interacción")
+# Esta ruta debe ser correcta
 @onready var interaction_ray = $CameraPivot/SpringArm3D/Camera3D/RayCast3D
+# Necesitamos la referencia a la cámara para saber dónde está el centro de la pantalla
+@onready var camera = $CameraPivot/SpringArm3D/Camera3D
 
 # --- REFERENCIAS ---
 @onready var camera_pivot = $CameraPivot
 @onready var visuals = $Casual_Hoodie 
 
-# IMPORTANTE: Ajusta la ruta si tu AnimationPlayer está más adentro
-# Si activaste "Hijos Editables", arrastra el nodo AnimationPlayer aquí para obtener la ruta correcta
+# Ajusta si es necesario
 @onready var anim_player = $Casual_Hoodie/AnimationPlayer
 
 func _physics_process(delta):
 	# 1. GRAVEDAD
 	if not is_on_floor():
 		velocity.y -= gravity * delta
+
+	# --- CORRECCIÓN DE PUNTERÍA (NUEVO) ---
+	# Esto obliga al RayCast a apuntar EXACTAMENTE al centro de tu pantalla,
+	# sin importar cuánto muevas la cámara con H_Offset.
+	if camera and interaction_ray:
+		# Calculamos el centro exacto de tu ventana de juego
+		var center_screen = get_viewport().get_visible_rect().size / 2
+		
+		# Proyectamos un punto desde la cámara hacia el infinito pasando por el centro
+		var ray_origin = camera.project_ray_origin(center_screen)
+		var ray_normal = camera.project_ray_normal(center_screen)
+		var ray_target = ray_origin + (ray_normal * 1000.0) # 1000 metros al frente
+		
+		# Forzamos al RayCast a mirar a ese punto
+		interaction_ray.global_position = ray_origin
+		interaction_ray.look_at(ray_target)
+
 
 	# 2. INPUT
 	var input_dir = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
@@ -43,13 +64,11 @@ func _physics_process(delta):
 		direction = (cam_forward * -input_dir.y) + (cam_right * input_dir.x)
 		direction = direction.normalized()
 
-	# 4. MOVER Y ANIMAR (MODIFICADO)
+	# 4. MOVER Y ANIMAR
 	if direction:
 		velocity.x = direction.x * speed
 		velocity.z = direction.z * speed
 		
-		# --- AQUÍ ACTIVAMOS LA ANIMACIÓN DE CAMINAR ---
-		# Cambia "Walk" por el nombre exacto que viste en el AnimationPlayer
 		if anim_player:
 			anim_player.play("Walk") 
 			
@@ -57,8 +76,6 @@ func _physics_process(delta):
 		velocity.x = move_toward(velocity.x, 0, speed)
 		velocity.z = move_toward(velocity.z, 0, speed)
 		
-		# --- AQUÍ ACTIVAMOS LA ANIMACIÓN DE ESTAR QUIETO ---
-		# Cambia "Idle" por el nombre exacto
 		if anim_player:
 			anim_player.play("Idle")
 
@@ -78,7 +95,17 @@ func _physics_process(delta):
 		check_interaction()
 
 func check_interaction():
+	# DEBUG: Verifica qué toca el rayo corregido
 	if interaction_ray.is_colliding():
 		var objeto = interaction_ray.get_collider()
+		# print("Tocando: ", objeto.name) # Descomenta si necesitas probar
+		
 		if objeto.has_method("interactuar"):
 			objeto.interactuar()
+			agregar_llave()
+
+func agregar_llave():
+	llaves_colectadas += 1
+	contador_label.text = "Llaves: " + str(llaves_colectadas)
+	print("¡Tengo una llave más!")
+	# Actualizamos el texto en pantalla
