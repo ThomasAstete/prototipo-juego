@@ -1,6 +1,10 @@
 extends CharacterBody3D
 
 # --- CONFIGURACIÓN ---
+@onready var sonido_pasos = $SonidoPasos
+@onready var timer_pasos = $Timer
+@onready var sonido_llave = $SonidoLlave
+@onready var linterna = $CameraPivot/SpringArm3D/Camera3D/SpotLight3D # Ajusta la ruta si la pusiste en otro lado
 var llaves_colectadas : int = 0
 @onready var contador_label = $CanvasLayer/ContadorUI # Ajusta la ruta si es necesario
 @export_group("Movimiento")
@@ -71,6 +75,21 @@ func _physics_process(delta):
 		
 		if anim_player:
 			anim_player.play("Walk") 
+		# --- LÓGICA DE PASOS ---
+		if timer_pasos.is_stopped() and is_on_floor():
+			# 1. Reproducir desde el segundo 0.94
+			sonido_pasos.play(0.94)
+			
+			# 2. CALCULAR CORTE:
+			# Si dejas que suene hasta 2.93, se amontonarán los sonidos.
+			# Te recomiendo cortarlo cuando des el siguiente paso (0.66 seg después).
+			# Si aun así quieres el audio largo, usa: var duracion = 2.93 - 0.94
+			
+			var duracion_corte = 0.6 # Cortamos el sonido justo antes del siguiente paso
+			get_tree().create_timer(duracion_corte).timeout.connect(sonido_pasos.stop)
+			
+			# 3. Reiniciar el Timer para que vuelva a entrar aquí en el siguiente pie
+			timer_pasos.start()
 			
 	else:
 		velocity.x = move_toward(velocity.x, 0, speed)
@@ -78,6 +97,12 @@ func _physics_process(delta):
 		
 		if anim_player:
 			anim_player.play("Idle")
+	# CONTROL LINTERNA
+	if Input.is_action_just_pressed("flashlight"):
+		# Invertimos el estado: Si está prendida se apaga, y viceversa
+		if linterna:
+			linterna.visible = not linterna.visible
+
 
 	move_and_slide()
 
@@ -109,3 +134,14 @@ func agregar_llave():
 	contador_label.text = "Llaves: " + str(llaves_colectadas)
 	print("¡Tengo una llave más!")
 	# Actualizamos el texto en pantalla
+	if sonido_llave:
+		# 1. Le decimos que empiece EXACTAMENTE en el segundo 2.12
+		sonido_llave.play(2.12)
+		
+		# 2. Calculamos la duración (Matemáticas: Final - Inicio)
+		# 3.97 - 2.12 = 1.85 segundos
+		var duracion = 1.85
+		
+		# 3. Creamos un temporizador "desechable" que detenga el sonido
+		# Esto espera 1.85 segundos y luego ejecuta sonido_llave.stop()
+		get_tree().create_timer(duracion).timeout.connect(sonido_llave.stop)

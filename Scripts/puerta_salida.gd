@@ -2,6 +2,7 @@ extends Area3D
 
 # Cantidad de llaves necesarias para ganar
 @export var llaves_necesarias : int = 3
+@onready var sonido_victoria = $SonidoVictoria
 
 func _ready():
 	# Esto conecta automáticamente la señal de "alguien entró"
@@ -30,5 +31,12 @@ func ganar_partida(player):
 	if cartel:
 		cartel.visible = true
 	
-	# 2. (Opcional) Detener el tiempo del juego
-	# get_tree().paused = true
+	if sonido_victoria:
+		# 1. Empezar en el segundo 0.87
+		sonido_victoria.play(0.87)
+		
+		# 2. Calcular cuánto debe sonar (2.39 - 0.87 = 1.52)
+		var duracion = 1.52
+		
+		# 3. Crear el temporizador para detenerlo
+		get_tree().create_timer(duracion).timeout.connect(sonido_victoria.stop)

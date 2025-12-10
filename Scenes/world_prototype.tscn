@@ -1,10 +1,11 @@
-[gd_scene load_steps=11 format=3 uid="uid://bpelk0ox6peai"]
+[gd_scene load_steps=12 format=3 uid="uid://bpelk0ox6peai"]
 
 [ext_resource type="Material" uid="uid://kxis4q124ki1" path="res://Assets/Textures/suelo.tres" id="1_ahdyh"]
 [ext_resource type="PackedScene" uid="uid://cxiu3uoil06js" path="res://Scenes/player.tscn" id="2_kejqg"]
 [ext_resource type="PackedScene" uid="uid://d3tkrl6yurbpf" path="res://Scenes/item_llave.tscn" id="3_qgln6"]
 [ext_resource type="Script" uid="uid://bdabh3y06yxub" path="res://Scripts/generador_items.gd" id="3_v2md1"]
 [ext_resource type="Script" uid="uid://uwa3eskqt0ys" path="res://Scripts/puerta_salida.gd" id="5_sa2hf"]
+[ext_resource type="AudioStream" uid="uid://cpccxcfb01orm" path="res://Assets/FX/chirrido-de-puerta-335976.mp3" id="6_m7du4"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_qgln6"]
 sky_top_color = Color(0.5294118, 0.80784315, 0.92156863, 1)
@@ -82,3 +83,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.00432539, 0.20000005)
 size = Vector3(1.5, 2.5, 0.2)
 material = SubResource("StandardMaterial3D_sa2hf")
 metadata/_edit_group_ = true
+
+[node name="SonidoVictoria" type="AudioStreamPlayer" parent="PuertaSalida"]
+stream = ExtResource("6_m7du4")
