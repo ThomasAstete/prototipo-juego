@@ -1,49 +1,84 @@
 extends CharacterBody3D
 
 # --- CONFIGURACIÓN ---
+@export_group("Movimiento")
 @export var speed : float = 5.0
-@export var rotation_speed : float = 12.0
+@export var rotation_speed : float = 10.0
 @export var gravity : float = 20.0
 
+@export_group("Ajustes Visuales")
+@export var rotation_offset : float = 180.0 
+
+@export_group("Interacción")
+@onready var interaction_ray = $CameraPivot/SpringArm3D/Camera3D/RayCast3D
+
 # --- REFERENCIAS ---
-# Asegúrate de que estos nombres sean IDÉNTICOS a los de tu panel de escena
 @onready var camera_pivot = $CameraPivot
-@onready var visuals = $Casual_Hoodie  
+@onready var visuals = $Casual_Hoodie 
+
+# IMPORTANTE: Ajusta la ruta si tu AnimationPlayer está más adentro
+# Si activaste "Hijos Editables", arrastra el nodo AnimationPlayer aquí para obtener la ruta correcta
+@onready var anim_player = $Casual_Hoodie/AnimationPlayer
 
 func _physics_process(delta):
-	# 1. Aplicar Gravedad (Importante para evitar comportamientos raros en el suelo)
+	# 1. GRAVEDAD
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 
-	# 2. Obtener Inputs
-	# Usamos "ui_..." que ya vienen configurados por defecto (Flechas o WASD)
-	var input_dir = Input.get_vector("left", "right", "forward", "back")
+	# 2. INPUT
+	var input_dir = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	
-	# 3. Calcular dirección relativa a la CÁMARA
-	# Esto es vital: "Arriba" debe ser "Hacia el fondo de la pantalla", no "Norte"
+	# 3. DIRECCIÓN
 	var direction = Vector3.ZERO
-	
 	if input_dir != Vector2.ZERO:
-		# Obtenemos hacia dónde mira la cámara (solo en el eje Y, horizontal)
-		var cam_rot_y = camera_pivot.global_transform.basis.get_euler().y
+		var cam_basis = camera_pivot.global_transform.basis
+		var cam_forward = -cam_basis.z
+		var cam_right = cam_basis.x
+		cam_forward.y = 0
+		cam_right.y = 0
+		cam_forward = cam_forward.normalized()
+		cam_right = cam_right.normalized()
 		
-		# Convertimos el input 2D en dirección 3D
-		direction = Vector3(input_dir.x, 0, input_dir.y).rotated(Vector3.UP, cam_rot_y).normalized()
+		# W es adelante
+		direction = (cam_forward * -input_dir.y) + (cam_right * input_dir.x)
+		direction = direction.normalized()
 
-	# 4. Movimiento y Rotación
+	# 4. MOVER Y ANIMAR (MODIFICADO)
 	if direction:
-		# Asignar velocidad
 		velocity.x = direction.x * speed
 		velocity.z = direction.z * speed
 		
-		# Rotar el modelo (Visuals) hacia donde camina
-		# Usamos atan2 para obtener el ángulo del movimiento
-		var target_rotation = atan2(direction.x, direction.z)
-		# Usamos lerp_angle para suavizar el giro
-		visuals.rotation.y = lerp_angle(visuals.rotation.y, target_rotation, rotation_speed * delta)
+		# --- AQUÍ ACTIVAMOS LA ANIMACIÓN DE CAMINAR ---
+		# Cambia "Walk" por el nombre exacto que viste en el AnimationPlayer
+		if anim_player:
+			anim_player.play("Walk") 
+			
 	else:
-		# Frenado suave (fricción)
 		velocity.x = move_toward(velocity.x, 0, speed)
 		velocity.z = move_toward(velocity.z, 0, speed)
+		
+		# --- AQUÍ ACTIVAMOS LA ANIMACIÓN DE ESTAR QUIETO ---
+		# Cambia "Idle" por el nombre exacto
+		if anim_player:
+			anim_player.play("Idle")
 
 	move_and_slide()
+
+	# 5. ROTAR VISUALS
+	if direction != Vector3.ZERO and not camera_pivot.is_aiming:
+		var target_angle = atan2(-direction.x, -direction.z) + deg_to_rad(rotation_offset)
+		visuals.rotation.y = lerp_angle(visuals.rotation.y, target_angle, rotation_speed * delta)
+		
+	elif camera_pivot.is_aiming:
+		var target_angle = camera_pivot.global_rotation.y + deg_to_rad(rotation_offset)
+		visuals.rotation.y = lerp_angle(visuals.rotation.y, target_angle, rotation_speed * delta)
+
+	# 6. INTERACCIÓN
+	if Input.is_action_just_pressed("interact"):
+		check_interaction()
+
+func check_interaction():
+	if interaction_ray.is_colliding():
+		var objeto = interaction_ray.get_collider()
+		if objeto.has_method("interactuar"):
+			objeto.interactuar()

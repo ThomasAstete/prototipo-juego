@@ -1,6 +1,26 @@
-[gd_scene load_steps=2 format=3 uid="uid://bpelk0ox6peai"]
+[gd_scene load_steps=8 format=3 uid="uid://bpelk0ox6peai"]
 
 [ext_resource type="Material" uid="uid://kxis4q124ki1" path="res://Assets/Textures/suelo.tres" id="1_ahdyh"]
+[ext_resource type="PackedScene" uid="uid://cxiu3uoil06js" path="res://Scenes/player.tscn" id="2_kejqg"]
+[ext_resource type="PackedScene" uid="uid://d3tkrl6yurbpf" path="res://Scenes/item_llave.tscn" id="3_qgln6"]
+[ext_resource type="Script" uid="uid://bdabh3y06yxub" path="res://Scripts/generador_items.gd" id="3_v2md1"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_qgln6"]
+sky_top_color = Color(0.5294118, 0.80784315, 0.92156863, 1)
+
+[sub_resource type="Sky" id="Sky_v2md1"]
+sky_material = SubResource("ProceduralSkyMaterial_qgln6")
+
+[sub_resource type="Environment" id="Environment_sa2hf"]
+background_mode = 2
+sky = SubResource("Sky_v2md1")
+ambient_light_source = 2
+ambient_light_color = Color(0.64705884, 0.6156863, 0.58431375, 1)
+ambient_light_energy = 0.2
+tonemap_mode = 2
+ssr_enabled = true
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.01
 
 [node name="WorldPrototype" type="Node3D"]
 
@@ -8,3 +28,33 @@
 material_override = ExtResource("1_ahdyh")
 use_collision = true
 size = Vector3(40, 1, 40)
+material = ExtResource("1_ahdyh")
+
+[node name="Player" parent="." instance=ExtResource("2_kejqg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+
+[node name="CSGCombiner3D" type="CSGCombiner3D" parent="."]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="CSGCombiner3D"]
+size = Vector3(40, 40, 40)
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="CSGCombiner3D"]
+operation = 2
+size = Vector3(39, 39, 39)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.0039269384, 0.9999923, 0, -0.9999923, 0.0039269384, 0, 15, 0)
+light_color = Color(0.8509804, 0.4392157, 0.19215687, 1)
+light_energy = 0.2
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_sa2hf")
+
+[node name="GeneradorItems" type="Node3D" parent="."]
+script = ExtResource("3_v2md1")
+objeto_escena = ExtResource("3_qgln6")
+cantidad = 8
+altura_spawn = 1.0
+area_x = 18.0
+area_z = 18.0

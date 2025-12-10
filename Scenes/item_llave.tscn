@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://d3tkrl6yurbpf"]
+
+[ext_resource type="Script" uid="uid://c0llma8t8g74o" path="res://Scripts/item_llave.gd" id="1_tha5g"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_1x7i6"]
+size = Vector3(0.3, 0.3, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qq6ay"]
+size = Vector3(0.3, 0.3, 0.3)
+
+[node name="Item_Llave" type="StaticBody3D"]
+collision_layer = 16
+script = ExtResource("1_tha5g")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_1x7i6")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_qq6ay")
