@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://bpelk0ox6peai"]
+
+[ext_resource type="Material" uid="uid://kxis4q124ki1" path="res://Assets/Textures/suelo.tres" id="1_ahdyh"]
+
+[node name="WorldPrototype" type="Node3D"]
+
+[node name="Suelo" type="CSGBox3D" parent="."]
+material_override = ExtResource("1_ahdyh")
+use_collision = true
+size = Vector3(40, 1, 40)

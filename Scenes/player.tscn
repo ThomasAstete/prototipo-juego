@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=3 uid="uid://cxiu3uoil06js"]
+
+[ext_resource type="Script" uid="uid://7vl4eargj0uj" path="res://Scripts/player.gd" id="1_cvnsp"]
+[ext_resource type="PackedScene" uid="uid://bjx666vhoc4g6" path="res://Assets/Characters/Casual_Hoodie.gltf" id="1_v0iea"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_cvnsp"]
+height = 1.6883545
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_cvnsp")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.034, 1, 0)
+shape = SubResource("CapsuleShape3D_cvnsp")
+
+[node name="CameraPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+
+[node name="SpringArm3D" type="SpringArm3D" parent="CameraPivot"]
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot/SpringArm3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.026415467, 1.0778921, 0.41207826)
+fov = 50.0
+
+[node name="Casual_Hoodie" parent="." instance=ExtResource("1_v0iea")]
